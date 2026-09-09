@@ -1,0 +1,20 @@
+# Supabase project configuration
+# https://supabase.com/docs/guides/local-development/cli/config
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+port = 54323
+
+# Edge functions will be added here as they are deployed:
+# [functions.ai-trivia-generator]
+# verify_jwt = true
+# entrypoint = "./functions/ai-trivia-generator/index.ts"
