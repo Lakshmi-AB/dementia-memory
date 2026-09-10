@@ -17,6 +17,7 @@ export interface LanguageConfig {
   navProgress: string;
   fallback: string;
   goodJob: string;
+  languageUpdated: string;
 }
 
 export const languages: LanguageConfig[] = [
@@ -37,6 +38,7 @@ export const languages: LanguageConfig[] = [
     navProgress: 'উন্নতি',
     fallback: 'মই বুজিব নোৱাৰিলো। অনুগ্ৰহ কৰি পুনৰ কওক।',
     goodJob: 'ৱল ডন! আপুনি ভাল কৰিলে!',
+    languageUpdated: 'ভাষা আপডেট কৰা হৈছে। অসমীয়া ভাষা এতিয়া সক্ৰিয়।',
   },
   {
     id: 'khasi',
@@ -55,6 +57,7 @@ export const languages: LanguageConfig[] = [
     navProgress: 'Ka progress',
     fallback: 'Nga iathuh khann. Pynreh ia ngi.',
     goodJob: 'Khublei! I la pynsuk ia kane!',
+    languageUpdated: 'Language updated. Khasi language is now active.',
   },
   {
     id: 'manipuri',
@@ -73,6 +76,7 @@ export const languages: LanguageConfig[] = [
     navProgress: 'পোত্থোক',
     fallback: 'মচিন খরিবনি। অদুগা নুংঙি তৌবিয়ু।',
     goodJob: 'থৌৱাই! নহাক য়াম্মি তৌরে!',
+    languageUpdated: 'ভাষা আপডেট তৌরে। মণিপুরী ভাষা এতিয়া সক্ৰিয়।',
   },
   {
     id: 'english',
@@ -91,6 +95,7 @@ export const languages: LanguageConfig[] = [
     navProgress: 'My Progress',
     fallback: "I didn't catch that. Please try again.",
     goodJob: 'Well done! You did great!',
+    languageUpdated: 'Language updated. English is now active.',
   },
 ];
 

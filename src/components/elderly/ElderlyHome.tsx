@@ -74,14 +74,17 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
     }
   }, [langConfig.ttsLang]);
 
-  // Play greeting on first mount
+  // Play greeting on first mount and whenever language changes
   useEffect(() => {
+    const greeting = `${langConfig.morningGreeting} ${patientName}! ${langConfig.homePrompt}`;
     if (!greetingPlayed) {
       setGreetingPlayed(true);
-      const greeting = `${langConfig.morningGreeting} ${patientName}! ${langConfig.homePrompt}`;
       setTimeout(() => speak(greeting), 500);
+    } else {
+      speak(greeting);
     }
-  }, [greetingPlayed, langConfig, patientName, speak]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
 
   // Cleanup
   useEffect(() => {

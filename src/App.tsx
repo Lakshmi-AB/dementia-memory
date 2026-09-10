@@ -8,6 +8,7 @@ import ElderlyReminders from '@/components/elderly/ElderlyReminders';
 import ElderlyVoiceAssistant from '@/components/elderly/ElderlyVoiceAssistant';
 import ElderlyProgress from '@/components/elderly/ElderlyProgress';
 import VoiceOnboarding from '@/components/elderly/VoiceOnboarding';
+import CaregiverQuickBar from '@/components/CaregiverQuickBar';
 import { useVoiceOnboarding } from '@/hooks/useVoiceOnboarding';
 import { getStoredLanguage, type AppLanguage } from '@/lib/languageConfig';
 import { usePatients } from '@/hooks/usePatients';
@@ -85,8 +86,12 @@ function App() {
 
   const currentLanguage = language ?? 'english';
 
+  const handleLanguageChange = useCallback((lang: AppLanguage) => {
+    setLanguage(lang);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-slate-50">
       <Header
         mode={mode}
         onToggleMode={toggleMode}
@@ -94,6 +99,7 @@ function App() {
         onElderlyHome={goElderlyHome}
       />
 
+      <div className="flex-1">
       {mode === 'caregiver' && (
         <main className="p-8">
           <div className="mx-auto max-w-6xl">
@@ -135,6 +141,12 @@ function App() {
           )}
         </main>
       )}
+      </div>
+
+      <CaregiverQuickBar
+        currentLanguage={currentLanguage}
+        onLanguageChange={handleLanguageChange}
+      />
     </div>
   );
 }
