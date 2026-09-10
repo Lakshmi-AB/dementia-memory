@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Gamepad2, Bell, Mic, BarChart3, Volume2, Sparkles } from 'lucide-react';
+import { Gamepad2, Bell, Mic, BarChart3, Sparkles } from 'lucide-react';
 import { getLanguageConfig, type AppLanguage } from '@/lib/languageConfig';
 
 type ElderlyView = 'home' | 'games' | 'reminders' | 'voice' | 'progress';
@@ -147,36 +147,6 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
         <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl">{t.morningGreeting}</h1>
         <p className="mt-2 text-3xl font-bold text-brand-700">{patientName}!</p>
         <p className="mt-3 text-2xl font-semibold text-slate-600">{t.homePrompt}</p>
-      </div>
-
-      <div className="mb-8 flex flex-col items-center gap-4">
-        <button
-          onClick={listening ? stopVoiceCommand : startVoiceCommand}
-          className={`flex h-20 w-20 items-center justify-center rounded-full transition-all duration-300 ${
-            listening
-              ? 'bg-error-500 text-white animate-pulse scale-110 shadow-xl shadow-error-300'
-              : 'bg-brand-600 text-white hover:bg-brand-700 hover:scale-105 shadow-lg'
-          }`}
-        >
-          <Mic className="h-10 w-10" strokeWidth={2} />
-        </button>
-        <p className="text-xl font-bold text-slate-600">
-          {listening ? t.listening : t.tapToSpeak}
-        </p>
-
-        {transcript && (
-          <div className="w-full max-w-lg rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 animate-fade-in">
-            <p className="text-sm font-bold text-slate-500">{t.youSaid}</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">"{transcript}"</p>
-          </div>
-        )}
-
-        {response && (
-          <div className="flex w-full max-w-lg items-start gap-3 rounded-2xl border-2 border-brand-200 bg-brand-50 p-4 animate-fade-in">
-            <Volume2 className="h-7 w-7 shrink-0 text-brand-600" />
-            <p className="text-xl font-semibold text-slate-900">{response}</p>
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

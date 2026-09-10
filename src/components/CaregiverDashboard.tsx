@@ -5,11 +5,10 @@ import {
 } from 'lucide-react';
 import { usePatients } from '@/hooks/usePatients';
 import { useGameSessions } from '@/hooks/useGameSessions';
-import { useTriviaRounds } from '@/hooks/useTriviaRounds';
 import { useReminders } from '@/hooks/useReminders';
 import PatientForm from '@/components/PatientForm';
 import WeeklyAccuracyChart from '@/components/WeeklyAccuracyChart';
-import type { Patient, GameSession, TriviaRound, Reminder } from '@/types';
+import type { Patient, GameSession, Reminder } from '@/types';
 
 const colorMap: Record<string, string> = {
   teal: '#14b8a6',
@@ -29,15 +28,9 @@ const careLevelStyles: Record<string, string> = {
 export default function CaregiverDashboard() {
   const { patients, loading, error, addPatient, deletePatient } = usePatients();
   const { sessions, loading: sessionsLoading } = useGameSessions();
-  const { fetchRounds } = useTriviaRounds();
   const { reminders } = useReminders();
   const [showForm, setShowForm] = useState(false);
-  const [triviaRounds, setTriviaRounds] = useState<TriviaRound[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchRounds().then(setTriviaRounds).catch(() => {});
-  }, [fetchRounds, patients.length]);
 
   useEffect(() => {
     if (patients.length > 0 && !selectedPatientId) {
@@ -47,7 +40,6 @@ export default function CaregiverDashboard() {
 
   const selectedPatient = patients.find((p) => p.id === selectedPatientId);
   const patientSessions = sessions.filter((s) => s.patient_id === selectedPatientId);
-  const patientTrivia = triviaRounds.filter((t) => t.patient_id === selectedPatientId);
   const patientReminders = reminders.filter((r) => r.patient_id === selectedPatientId);
   const today = new Date().getDay();
   const todayReminders = patientReminders.filter((r) => r.day_of_week === today || r.day_of_week === 0);
@@ -237,32 +229,6 @@ export default function CaregiverDashboard() {
                               <Clock className="h-3.5 w-3.5" />
                               {s.duration_seconds}s
                             </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="card-pad">
-                  <div className="mb-4 flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-accent-600" />
-                    <h3 className="text-lg font-bold text-slate-900">Recent Trivia Rounds</h3>
-                  </div>
-                  {patientTrivia.length === 0 ? (
-                    <p className="text-base font-semibold text-slate-400">No trivia rounds yet.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {patientTrivia.slice(0, 5).map((t) => (
-                        <div key={t.id} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2">
-                          <div className="flex items-center gap-2">
-                            <Brain className="h-4 w-4 text-accent-600" />
-                            <span className="text-sm font-semibold text-slate-700">{t.topic}</span>
-                          </div>
-                          <div className="flex items-center gap-3 text-sm font-semibold text-slate-600">
-                            <span>{t.correct_count}/{t.question_count} correct</span>
-                            <span className="text-slate-400">·</span>
-                            <span>{Number(t.engagement_score)}% engagement</span>
                           </div>
                         </div>
                       ))}
