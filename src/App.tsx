@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header, { type AppMode } from '@/components/Header';
 import CaregiverDashboard from '@/components/CaregiverDashboard';
 import GameStation from '@/components/GameStation';
@@ -7,30 +7,83 @@ import ElderlyHome from '@/components/elderly/ElderlyHome';
 import ElderlyReminders from '@/components/elderly/ElderlyReminders';
 import ElderlyVoiceAssistant from '@/components/elderly/ElderlyVoiceAssistant';
 import ElderlyProgress from '@/components/elderly/ElderlyProgress';
+import VoiceOnboarding from '@/components/elderly/VoiceOnboarding';
+import { useVoiceOnboarding } from '@/hooks/useVoiceOnboarding';
+import { getStoredLanguage, type AppLanguage } from '@/lib/languageConfig';
 import { usePatients } from '@/hooks/usePatients';
 
 type ElderlyView = 'home' | 'games' | 'reminders' | 'voice' | 'progress';
+type AppState = 'onboarding' | 'app';
 
 function App() {
-  const [mode, setMode] = useState<AppMode>('caregiver');
+  const [appState, setAppState] = useState<AppState>(() => {
+    const stored = getStoredLanguage();
+    return stored ? 'app' : 'onboarding';
+  });
+  const [mode, setMode] = useState<AppMode>('elderly');
   const [elderlyView, setElderlyView] = useState<ElderlyView>('home');
+  const [language, setLanguage] = useState<AppLanguage | null>(() => getStoredLanguage());
   const { patients } = usePatients();
+
+  const {
+    phase,
+    selectedLanguage,
+    currentCycleIndex,
+    transcript,
+    error,
+    startOnboarding,
+    skipOnboarding,
+  } = useVoiceOnboarding();
 
   const activePatient = patients[0] ?? null;
   const activePatientId = activePatient?.id ?? null;
   const activePatientName = activePatient?.name ?? 'Friend';
 
-  const toggleMode = () => {
-    setMode((prev) => (prev === 'caregiver' ? 'elderly' : 'caregiver'));
-  };
+  // Start onboarding when app state is onboarding
+  useEffect(() => {
+    if (appState === 'onboarding') {
+      startOnboarding();
+    }
+  }, [appState, startOnboarding]);
 
-  const goElderlyHome = () => setElderlyView('home');
+  // Transition to app when onboarding is done
+  useEffect(() => {
+    if (phase === 'done' && selectedLanguage) {
+      setLanguage(selectedLanguage);
+      setAppState('app');
+    }
+  }, [phase, selectedLanguage]);
+
+  const toggleMode = useCallback(() => {
+    setMode((prev) => (prev === 'caregiver' ? 'elderly' : 'caregiver'));
+  }, []);
+
+  const goElderlyHome = useCallback(() => setElderlyView('home'), []);
 
   useEffect(() => {
     if (mode === 'caregiver') {
       setElderlyView('home');
     }
   }, [mode]);
+
+  // Onboarding screen
+  if (appState === 'onboarding') {
+    return (
+      <VoiceOnboarding
+        phase={phase}
+        currentCycleIndex={currentCycleIndex}
+        transcript={transcript}
+        error={error}
+        onSkip={(lang: AppLanguage) => {
+          skipOnboarding(lang);
+          setLanguage(lang);
+          setAppState('app');
+        }}
+      />
+    );
+  }
+
+  const currentLanguage = language ?? 'english';
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -55,6 +108,7 @@ function App() {
             <ElderlyHome
               onNavigate={(v) => setElderlyView(v)}
               patientName={activePatientName}
+              language={currentLanguage}
             />
           )}
           {elderlyView === 'games' && (
