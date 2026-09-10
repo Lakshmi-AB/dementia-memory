@@ -6,7 +6,6 @@ import {
   getStoredLanguage,
   storeLanguage,
   type AppLanguage,
-  type LanguageConfig,
 } from '@/lib/languageConfig';
 
 type OnboardingPhase = 'idle' | 'cycling' | 'detected' | 'confirming' | 'done' | 'unsupported';
@@ -143,7 +142,7 @@ export function useVoiceOnboarding() {
     const config = getLanguageConfig(lang);
 
     setPhase('confirming');
-    speak(config.confirmation, config.ttsLang, () => {
+    speak(config.t.confirmation, config.ttsLang, () => {
       setPhase('done');
     });
   }, [clearAllTimers, stopRecognition, speak]);
@@ -153,7 +152,7 @@ export function useVoiceOnboarding() {
 
     const lang = languages[index];
     setCurrentCycleIndex(index);
-    speak(lang.prompt, 'en-US', () => {
+    speak(lang.t.prompt, 'en-US', () => {
       if (phaseRef.current === 'cycling') {
         const nextIndex = (index + 1) % languages.length;
         cycleTimerRef.current = setTimeout(() => {

@@ -58,7 +58,6 @@ export default function VoiceOnboarding({
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-brand-800 to-brand-900 px-6">
-      {/* Animated mic icon */}
       <div className="relative mb-8">
         {isCycling && (
           <div className="absolute inset-0 animate-ping rounded-full bg-accent-400 opacity-30" />
@@ -82,19 +81,16 @@ export default function VoiceOnboarding({
         </div>
       </div>
 
-      {/* Title */}
       <h1 className="text-4xl font-bold text-white sm:text-5xl">
         {isCycling && 'Welcome to MindSpark'}
         {isConfirming && 'Language Confirmed!'}
       </h1>
 
-      {/* Subtitle */}
       <p className="mt-4 text-center text-2xl font-semibold text-brand-200">
         {isCycling && 'Please say the name of your language'}
         {isConfirming && 'Taking you to your home screen...'}
       </p>
 
-      {/* Language cycle display */}
       {isCycling && (
         <div className="mt-10 w-full max-w-lg">
           <div className="space-y-3">
@@ -124,7 +120,7 @@ export default function VoiceOnboarding({
                       <span className="ml-2 text-lg">{lang.nativeScript}</span>
                     </p>
                     <p className={`text-base font-semibold ${isActive ? 'text-accent-200' : 'text-brand-400'}`}>
-                      {lang.prompt}
+                      {lang.t.prompt}
                     </p>
                   </div>
                   {isActive && (
@@ -141,7 +137,6 @@ export default function VoiceOnboarding({
         </div>
       )}
 
-      {/* Live transcript */}
       {isCycling && transcript && (
         <div className="mt-6 rounded-2xl bg-brand-700/60 px-6 py-3 animate-fade-in">
           <p className="text-sm font-bold text-brand-300">I HEARD:</p>
@@ -149,7 +144,6 @@ export default function VoiceOnboarding({
         </div>
       )}
 
-      {/* Skip button */}
       {isCycling && (
         <div className="mt-8">
           <p className="mb-3 text-center text-sm font-semibold text-brand-400">

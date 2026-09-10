@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Bell, Check, Pill, Droplet, Dumbbell, Utensils, Bell as BellIcon } from 'lucide-react';
 import { useReminders } from '@/hooks/useReminders';
+import { getLanguageConfig, type AppLanguage } from '@/lib/languageConfig';
 import type { Reminder, ReminderCategory } from '@/types';
 
 const categoryIcons: Record<ReminderCategory, typeof Pill> = {
@@ -33,9 +34,11 @@ const defaultReminders: Omit<Reminder, 'id' | 'created_at'>[] = [
 interface ElderlyRemindersProps {
   onBack: () => void;
   patientId: string | null;
+  language: AppLanguage;
 }
 
-export default function ElderlyReminders({ onBack, patientId }: ElderlyRemindersProps) {
+export default function ElderlyReminders({ onBack, patientId, language }: ElderlyRemindersProps) {
+  const t = getLanguageConfig(language).t;
   const { reminders, loading, toggleReminder, addReminder } = useReminders(patientId ?? undefined);
   const [seeded, setSeeded] = useState(false);
 
@@ -61,24 +64,24 @@ export default function ElderlyReminders({ onBack, patientId }: ElderlyReminders
         onClick={onBack}
         className="mb-6 flex items-center gap-2 text-2xl font-bold text-brand-700 hover:text-brand-800"
       >
-        <ArrowLeft className="h-7 w-7" /> Back
+        <ArrowLeft className="h-7 w-7" /> {t.back}
       </button>
 
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-accent-100 text-accent-700">
           <Bell className="h-10 w-10" strokeWidth={2.5} />
         </div>
-        <h1 className="text-4xl font-bold text-slate-900">My Reminders</h1>
-        <p className="mt-2 text-2xl font-semibold text-slate-600">Your schedule for today</p>
+        <h1 className="text-4xl font-bold text-slate-900">{t.navReminders}</h1>
+        <p className="mt-2 text-2xl font-semibold text-slate-600">{t.remindersSubtitle}</p>
       </div>
 
       {loading ? (
-        <p className="text-center text-2xl font-semibold text-slate-500">Loading...</p>
+        <p className="text-center text-2xl font-semibold text-slate-500">{t.loading}</p>
       ) : (
         <div className="space-y-4">
           {todayReminders.length === 0 ? (
             <div className="card-pad text-center">
-              <p className="text-2xl font-semibold text-slate-500">No reminders for today.</p>
+              <p className="text-2xl font-semibold text-slate-500">{t.noReminders}</p>
             </div>
           ) : (
             todayReminders.map((reminder) => {

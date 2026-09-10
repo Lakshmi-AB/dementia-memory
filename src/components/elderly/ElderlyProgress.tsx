@@ -1,14 +1,17 @@
 import { ArrowLeft, Gamepad2, Trophy, Target, CheckCircle2 } from 'lucide-react';
 import { useGameSessions } from '@/hooks/useGameSessions';
 import { useReminders } from '@/hooks/useReminders';
+import { getLanguageConfig, type AppLanguage } from '@/lib/languageConfig';
 
 interface ElderlyProgressProps {
   onBack: () => void;
   patientId: string | null;
   patientName: string;
+  language: AppLanguage;
 }
 
-export default function ElderlyProgress({ onBack, patientId, patientName }: ElderlyProgressProps) {
+export default function ElderlyProgress({ onBack, patientId, patientName, language }: ElderlyProgressProps) {
+  const t = getLanguageConfig(language).t;
   const { sessions, loading } = useGameSessions(patientId ?? undefined);
   const { reminders } = useReminders(patientId ?? undefined);
 
@@ -31,33 +34,33 @@ export default function ElderlyProgress({ onBack, patientId, patientName }: Elde
   const blocks = [
     {
       icon: Gamepad2,
-      label: 'Games Played',
+      label: t.gamesPlayed,
       value: gamesPlayed,
-      sub: 'today',
+      sub: t.today,
       color: 'bg-brand-100 text-brand-700',
       done: gamesPlayed >= 1,
     },
     {
       icon: Trophy,
-      label: 'Best Score',
+      label: t.bestScore,
       value: bestScore,
-      sub: 'points',
+      sub: t.points,
       color: 'bg-accent-100 text-accent-700',
       done: bestScore >= 50,
     },
     {
       icon: Target,
-      label: 'Accuracy',
+      label: t.accuracy,
       value: `${avgAccuracy}%`,
-      sub: 'correct answers',
+      sub: t.correctAnswers,
       color: 'bg-success-100 text-success-700',
       done: avgAccuracy >= 70,
     },
     {
       icon: CheckCircle2,
-      label: 'Reminders Done',
+      label: t.remindersDone,
       value: `${completedReminders}/${todayReminders.length}`,
-      sub: 'completed',
+      sub: t.completed,
       color: 'bg-rose-100 text-rose-700',
       done: completedReminders === todayReminders.length && todayReminders.length > 0,
     },
@@ -69,18 +72,18 @@ export default function ElderlyProgress({ onBack, patientId, patientName }: Elde
         onClick={onBack}
         className="mb-6 flex items-center gap-2 text-2xl font-bold text-brand-700 hover:text-brand-800"
       >
-        <ArrowLeft className="h-7 w-7" /> Back
+        <ArrowLeft className="h-7 w-7" /> {t.back}
       </button>
 
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-slate-900">My Progress</h1>
+        <h1 className="text-4xl font-bold text-slate-900">{t.navProgress}</h1>
         <p className="mt-2 text-2xl font-semibold text-slate-600">
-          {patientName}, here is how you are doing today
+          {patientName}, {t.progressSubtitle}
         </p>
       </div>
 
       {loading ? (
-        <p className="text-center text-2xl font-semibold text-slate-500">Loading...</p>
+        <p className="text-center text-2xl font-semibold text-slate-500">{t.loading}</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {blocks.map((block) => {
@@ -105,7 +108,7 @@ export default function ElderlyProgress({ onBack, patientId, patientName }: Elde
                 {block.done && (
                   <div className="flex items-center gap-2 rounded-full bg-success-500 px-4 py-2 text-white">
                     <CheckCircle2 className="h-6 w-6" />
-                    <span className="text-lg font-bold">Goal Met!</span>
+                    <span className="text-lg font-bold">{t.goalMet}</span>
                   </div>
                 )}
               </div>

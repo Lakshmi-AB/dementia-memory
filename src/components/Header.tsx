@@ -1,4 +1,6 @@
-import { Brain, Heart, LayoutDashboard, User } from 'lucide-react';
+import { Brain, Heart, LayoutDashboard } from 'lucide-react';
+import type { AppLanguage } from '@/lib/languageConfig';
+import { getLanguageConfig } from '@/lib/languageConfig';
 
 export type AppMode = 'elderly' | 'caregiver';
 
@@ -7,9 +9,12 @@ interface HeaderProps {
   onToggleMode: () => void;
   elderlyView: string | null;
   onElderlyHome: () => void;
+  language: AppLanguage;
 }
 
-export default function Header({ mode, onToggleMode, elderlyView, onElderlyHome }: HeaderProps) {
+export default function Header({ mode, onToggleMode, elderlyView, onElderlyHome, language }: HeaderProps) {
+  const t = getLanguageConfig(language).t;
+
   return (
     <header
       className={`sticky top-0 z-50 border-b-2 shadow-sm transition-colors duration-300 ${
@@ -36,14 +41,14 @@ export default function Header({ mode, onToggleMode, elderlyView, onElderlyHome 
                 mode === 'elderly' ? 'text-white' : 'text-slate-900'
               }`}
             >
-              MindSpark
+              {t.appName}
             </h1>
             <p
               className={`text-sm font-semibold transition-colors ${
                 mode === 'elderly' ? 'text-brand-200' : 'text-slate-500'
               }`}
             >
-              {mode === 'elderly' ? 'MindCare' : 'Cognitive Care Platform'}
+              {mode === 'elderly' ? t.appTaglineElderly : t.appTaglineCaregiver}
             </p>
           </div>
         </button>
@@ -59,14 +64,14 @@ export default function Header({ mode, onToggleMode, elderlyView, onElderlyHome 
           {mode === 'elderly' ? (
             <>
               <LayoutDashboard className="h-5 w-5" strokeWidth={2.5} />
-              <span className="hidden sm:inline">Switch to Caregiver Dashboard</span>
-              <span className="sm:hidden">Caregiver</span>
+              <span className="hidden sm:inline">{t.switchToCaregiver}</span>
+              <span className="sm:hidden">{t.switchToCaregiverShort}</span>
             </>
           ) : (
             <>
               <Heart className="h-5 w-5" strokeWidth={2.5} />
-              <span className="hidden sm:inline">Switch to Elderly Mode</span>
-              <span className="sm:hidden">Elderly</span>
+              <span className="hidden sm:inline">{t.switchToElderly}</span>
+              <span className="sm:hidden">{t.switchToElderlyShort}</span>
             </>
           )}
         </button>

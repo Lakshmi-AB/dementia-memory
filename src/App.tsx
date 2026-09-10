@@ -40,14 +40,12 @@ function App() {
   const activePatientId = activePatient?.id ?? null;
   const activePatientName = activePatient?.name ?? 'Friend';
 
-  // Start onboarding when app state is onboarding
   useEffect(() => {
     if (appState === 'onboarding') {
       startOnboarding();
     }
   }, [appState, startOnboarding]);
 
-  // Transition to app when onboarding is done
   useEffect(() => {
     if (phase === 'done' && selectedLanguage) {
       setLanguage(selectedLanguage);
@@ -67,7 +65,6 @@ function App() {
     }
   }, [mode]);
 
-  // Onboarding screen
   if (appState === 'onboarding') {
     return (
       <VoiceOnboarding
@@ -97,50 +94,59 @@ function App() {
         onToggleMode={toggleMode}
         elderlyView={elderlyView !== 'home' ? elderlyView : null}
         onElderlyHome={goElderlyHome}
+        language={currentLanguage}
       />
 
       <div className="flex-1">
-      {mode === 'caregiver' && (
-        <main className="p-8">
-          <div className="mx-auto max-w-6xl">
-            <CaregiverDashboard />
-          </div>
-        </main>
-      )}
-
-      {mode === 'elderly' && (
-        <main className="min-h-[calc(100vh-73px)] bg-gradient-to-b from-brand-50 to-slate-50">
-          {elderlyView === 'home' && (
-            <ElderlyHome
-              onNavigate={(v) => setElderlyView(v)}
-              patientName={activePatientName}
-              language={currentLanguage}
-            />
-          )}
-          {elderlyView === 'games' && (
-            <div className="mx-auto max-w-6xl px-4 py-4">
-              <GameStation
-                preselectedPatientId={activePatientId}
-                onBack={goElderlyHome}
-                elderlyMode
-              />
+        {mode === 'caregiver' && (
+          <main className="p-8">
+            <div className="mx-auto max-w-6xl">
+              <CaregiverDashboard />
             </div>
-          )}
-          {elderlyView === 'reminders' && (
-            <ElderlyReminders onBack={goElderlyHome} patientId={activePatientId} />
-          )}
-          {elderlyView === 'voice' && (
-            <ElderlyVoiceAssistant onBack={goElderlyHome} />
-          )}
-          {elderlyView === 'progress' && (
-            <ElderlyProgress
-              onBack={goElderlyHome}
-              patientId={activePatientId}
-              patientName={activePatientName}
-            />
-          )}
-        </main>
-      )}
+          </main>
+        )}
+
+        {mode === 'elderly' && (
+          <main className="min-h-[calc(100vh-73px)] bg-gradient-to-b from-brand-50 to-slate-50">
+            {elderlyView === 'home' && (
+              <ElderlyHome
+                onNavigate={(v) => setElderlyView(v)}
+                patientName={activePatientName}
+                language={currentLanguage}
+              />
+            )}
+            {elderlyView === 'games' && (
+              <div className="mx-auto max-w-6xl px-4 py-4">
+                <GameStation
+                  preselectedPatientId={activePatientId}
+                  onBack={goElderlyHome}
+                  elderlyMode
+                />
+              </div>
+            )}
+            {elderlyView === 'reminders' && (
+              <ElderlyReminders
+                onBack={goElderlyHome}
+                patientId={activePatientId}
+                language={currentLanguage}
+              />
+            )}
+            {elderlyView === 'voice' && (
+              <ElderlyVoiceAssistant
+                onBack={goElderlyHome}
+                language={currentLanguage}
+              />
+            )}
+            {elderlyView === 'progress' && (
+              <ElderlyProgress
+                onBack={goElderlyHome}
+                patientId={activePatientId}
+                patientName={activePatientName}
+                language={currentLanguage}
+              />
+            )}
+          </main>
+        )}
       </div>
 
       <CaregiverQuickBar

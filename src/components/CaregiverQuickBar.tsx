@@ -14,16 +14,17 @@ const langShortLabels: Record<AppLanguage, string> = {
 };
 
 export default function CaregiverQuickBar({ currentLanguage, onLanguageChange }: CaregiverQuickBarProps) {
+  const t = getLanguageConfig(currentLanguage).t;
+
   const handleSwitch = (lang: AppLanguage) => {
     if (lang === currentLanguage) return;
     storeLanguage(lang);
     onLanguageChange(lang);
 
-    // Audibly announce "Language Updated" in the newly selected language
     const config = getLanguageConfig(lang);
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(config.languageUpdated);
+      const utterance = new SpeechSynthesisUtterance(config.t.languageUpdated);
       utterance.lang = config.ttsLang;
       utterance.rate = 0.8;
       utterance.pitch = 1;
@@ -37,7 +38,7 @@ export default function CaregiverQuickBar({ currentLanguage, onLanguageChange }:
         <div className="flex shrink-0 items-center gap-2">
           <Languages className="h-4 w-4 text-slate-400" strokeWidth={2} />
           <span className="text-xs font-bold tracking-wide text-slate-400 uppercase">
-            Caregiver Quick Actions
+            {t.caregiverQuickActions}
           </span>
         </div>
 

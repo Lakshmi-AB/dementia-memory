@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Gamepad2, Bell, Mic, BarChart3, Volume2, Sparkles } from 'lucide-react';
-import { getLanguageConfig, detectLanguageFromSpeech, type AppLanguage } from '@/lib/languageConfig';
-import type { LanguageConfig } from '@/lib/languageConfig';
+import { getLanguageConfig, type AppLanguage } from '@/lib/languageConfig';
 
 type ElderlyView = 'home' | 'games' | 'reminders' | 'voice' | 'progress';
 
@@ -19,49 +18,22 @@ interface NavCard {
   bg: string;
 }
 
-function buildCards(lang: LanguageConfig): NavCard[] {
-  return [
-    {
-      view: 'games',
-      emoji: '🧠',
-      icon: Gamepad2,
-      color: 'text-brand-700',
-      bg: 'bg-brand-100 hover:bg-brand-200 border-brand-300',
-    },
-    {
-      view: 'reminders',
-      emoji: '🔔',
-      icon: Bell,
-      color: 'text-accent-700',
-      bg: 'bg-accent-100 hover:bg-accent-200 border-accent-300',
-    },
-    {
-      view: 'voice',
-      emoji: '🎤',
-      icon: Mic,
-      color: 'text-rose-700',
-      bg: 'bg-rose-100 hover:bg-rose-200 border-rose-300',
-    },
-    {
-      view: 'progress',
-      emoji: '📊',
-      icon: BarChart3,
-      color: 'text-success-700',
-      bg: 'bg-success-100 hover:bg-success-200 border-success-300',
-    },
-  ];
-}
+const cards: NavCard[] = [
+  { view: 'games', emoji: '🧠', icon: Gamepad2, color: 'text-brand-700', bg: 'bg-brand-100 hover:bg-brand-200 border-brand-300' },
+  { view: 'reminders', emoji: '🔔', icon: Bell, color: 'text-accent-700', bg: 'bg-accent-100 hover:bg-accent-200 border-accent-300' },
+  { view: 'voice', emoji: '🎤', icon: Mic, color: 'text-rose-700', bg: 'bg-rose-100 hover:bg-rose-200 border-rose-300' },
+  { view: 'progress', emoji: '📊', icon: BarChart3, color: 'text-success-700', bg: 'bg-success-100 hover:bg-success-200 border-success-300' },
+];
 
 export default function ElderlyHome({ onNavigate, patientName, language }: ElderlyHomeProps) {
   const langConfig = getLanguageConfig(language);
-  const cards = buildCards(langConfig);
+  const t = langConfig.t;
 
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [response, setResponse] = useState('');
   const [greetingPlayed, setGreetingPlayed] = useState(false);
   const recognitionRef = useRef<any>(null);
-  const isListeningRef = useRef(false);
 
   const speak = useCallback((text: string) => {
     if ('speechSynthesis' in window) {
@@ -74,9 +46,8 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
     }
   }, [langConfig.ttsLang]);
 
-  // Play greeting on first mount and whenever language changes
   useEffect(() => {
-    const greeting = `${langConfig.morningGreeting} ${patientName}! ${langConfig.homePrompt}`;
+    const greeting = `${t.morningGreeting} ${patientName}! ${t.homePrompt}`;
     if (!greetingPlayed) {
       setGreetingPlayed(true);
       setTimeout(() => speak(greeting), 500);
@@ -86,7 +57,6 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  // Cleanup
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -99,19 +69,18 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
   const processCommand = useCallback((text: string): ElderlyView | null => {
     const lower = text.toLowerCase();
     const navKeywords: Record<Exclude<ElderlyView, 'home'>, string[]> = {
-      games: ['game', 'play', 'brain', langConfig.navGame.toLowerCase()],
-      reminders: ['remind', 'schedule', 'reminder', langConfig.navReminders.toLowerCase()],
-      voice: ['voice', 'assistant', 'speak', 'talk', langConfig.navVoice.toLowerCase()],
-      progress: ['progress', 'score', 'how am i', langConfig.navProgress.toLowerCase()],
+      games: ['game', 'play', 'brain', t.navGame.toLowerCase()],
+      reminders: ['remind', 'schedule', 'reminder', t.navReminders.toLowerCase()],
+      voice: ['voice', 'assistant', 'speak', 'talk', t.navVoice.toLowerCase()],
+      progress: ['progress', 'score', 'how am i', t.navProgress.toLowerCase()],
     };
-
     for (const [view, keywords] of Object.entries(navKeywords)) {
       for (const kw of keywords) {
         if (kw && lower.includes(kw)) return view as ElderlyView;
       }
     }
     return null;
-  }, [langConfig]);
+  }, [t]);
 
   const startVoiceCommand = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -132,40 +101,41 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
       setTranscript(speechResult);
       const command = processCommand(speechResult);
       if (command) {
-        setResponse(langConfig.goodJob);
-        speak(langConfig.goodJob);
+        setResponse(t.goodJob);
+        speak(t.goodJob);
         setTimeout(() => onNavigate(command), 1500);
       } else {
-        setResponse(langConfig.fallback);
-        speak(langConfig.fallback);
+        setResponse(t.fallback);
+        speak(t.fallback);
       }
     };
 
     recognition.onerror = () => {
-      setResponse(langConfig.fallback);
-      speak(langConfig.fallback);
+      setResponse(t.fallback);
+      speak(t.fallback);
     };
 
-    recognition.onend = () => {
-      isListeningRef.current = false;
-      setListening(false);
-    };
+    recognition.onend = () => setListening(false);
 
-    isListeningRef.current = true;
     try { recognition.start(); } catch { /* noop */ }
-  }, [processCommand, speak, langConfig, onNavigate]);
+  }, [processCommand, speak, t, onNavigate]);
 
   const stopVoiceCommand = useCallback(() => {
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch { /* noop */ }
     }
-    isListeningRef.current = false;
     setListening(false);
   }, []);
 
+  const labelMap: Record<Exclude<ElderlyView, 'home'>, string> = {
+    games: t.navGame,
+    reminders: t.navReminders,
+    voice: t.navVoice,
+    progress: t.navProgress,
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      {/* Greeting */}
       <div className="mb-8 text-center">
         <div className="mb-4 flex items-center justify-center gap-2">
           <Sparkles className="h-8 w-8 text-brand-500" />
@@ -174,16 +144,11 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
           </span>
           <Sparkles className="h-8 w-8 text-brand-500" />
         </div>
-        <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl">
-          {langConfig.morningGreeting}
-        </h1>
+        <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl">{t.morningGreeting}</h1>
         <p className="mt-2 text-3xl font-bold text-brand-700">{patientName}!</p>
-        <p className="mt-3 text-2xl font-semibold text-slate-600">
-          {langConfig.homePrompt}
-        </p>
+        <p className="mt-3 text-2xl font-semibold text-slate-600">{t.homePrompt}</p>
       </div>
 
-      {/* Voice command bar */}
       <div className="mb-8 flex flex-col items-center gap-4">
         <button
           onClick={listening ? stopVoiceCommand : startVoiceCommand}
@@ -196,12 +161,12 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
           <Mic className="h-10 w-10" strokeWidth={2} />
         </button>
         <p className="text-xl font-bold text-slate-600">
-          {listening ? 'Listening...' : 'Tap to speak a command'}
+          {listening ? t.listening : t.tapToSpeak}
         </p>
 
         {transcript && (
           <div className="w-full max-w-lg rounded-2xl border-2 border-slate-200 bg-slate-50 p-4 animate-fade-in">
-            <p className="text-sm font-bold text-slate-500">YOU SAID:</p>
+            <p className="text-sm font-bold text-slate-500">{t.youSaid}</p>
             <p className="mt-1 text-xl font-semibold text-slate-900">"{transcript}"</p>
           </div>
         )}
@@ -214,16 +179,9 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
         )}
       </div>
 
-      {/* Action cards */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {cards.map((card) => {
           const Icon = card.icon;
-          const labelMap: Record<Exclude<ElderlyView, 'home'>, string> = {
-            games: langConfig.navGame,
-            reminders: langConfig.navReminders,
-            voice: langConfig.navVoice,
-            progress: langConfig.navProgress,
-          };
           return (
             <button
               key={card.view}
@@ -232,9 +190,7 @@ export default function ElderlyHome({ onNavigate, patientName, language }: Elder
             >
               <span className="text-6xl" aria-hidden="true">{card.emoji}</span>
               <Icon className={`h-10 w-10 ${card.color}`} strokeWidth={2.5} />
-              <div>
-                <h2 className="text-3xl font-bold text-slate-900">{labelMap[card.view]}</h2>
-              </div>
+              <h2 className="text-3xl font-bold text-slate-900">{labelMap[card.view]}</h2>
             </button>
           );
         })}
